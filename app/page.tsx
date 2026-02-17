@@ -1,65 +1,274 @@
-import Image from "next/image";
+"use client";
+
+import { motion } from "motion/react";
+import Link from "next/link";
+import {
+  ArrowRight,
+  Code,
+  Smartphone,
+  Cloud,
+  Palette,
+  CheckCircle,
+} from "lucide-react";
+import { ImageWithFallback } from "@/components/ImageWithFallback";
 
 export default function Home() {
+  const services = [
+    {
+      icon: <Code size={32} />,
+      title: "Web Development",
+      description:
+        "Custom web applications built with cutting-edge technologies for optimal performance.",
+    },
+    {
+      icon: <Smartphone size={32} />,
+      title: "Mobile Apps",
+      description:
+        "Native and cross-platform mobile solutions that deliver exceptional user experiences.",
+    },
+    {
+      icon: <Cloud size={32} />,
+      title: "Cloud Solutions",
+      description:
+        "Scalable cloud infrastructure and migration services to power your business growth.",
+    },
+    {
+      icon: <Palette size={32} />,
+      title: "UI/UX Design",
+      description:
+        "Beautiful, intuitive designs that engage users and drive conversions.",
+    },
+  ];
+
+  const stats = [
+    { number: "500+", label: "Projects Delivered" },
+    { number: "200+", label: "Happy Clients" },
+    { number: "50+", label: "Team Members" },
+    { number: "15+", label: "Years Experience" },
+  ];
+
+  const features = [
+    "Agile Development Process",
+    "24/7 Support & Maintenance",
+    "Quality Assurance Testing",
+    "On-time Delivery Guarantee",
+    "Scalable Architecture",
+    "Cost-effective Solutions",
+  ];
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+    <div className="bg-white">
+      <section className="relative min-h-screen flex items-center overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#8b0000] via-[#c00] to-[#e8272c]">
+          <div className="absolute inset-0 opacity-20">
+            <ImageWithFallback
+              src="https://images.unsplash.com/photo-1644088379091-d574269d422f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMHRlY2hub2xvZ3klMjBuZXR3b3JrfGVufDF8fHx8MTc3MTIzODYwN3ww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
+              alt="Technology background"
+              className="w-full h-full object-cover"
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+          </div>
         </div>
-      </main>
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+            >
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6">
+                Transform Your
+                <span className="block bg-gradient-to-r from-red-300 to-pink-300 bg-clip-text text-transparent">
+                  Digital Vision
+                </span>
+              </h1>
+              <p className="text-xl text-gray-200 mb-8">
+                We craft innovative software solutions that drive business
+                growth and deliver exceptional user experiences.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link
+                  href="/contact"
+                  className="inline-flex items-center justify-center px-8 py-4 bg-white text-[#e8272c] rounded-full hover:shadow-2xl transition-all transform hover:scale-105"
+                >
+                  Get Started
+                  <ArrowRight className="ml-2" size={20} />
+                </Link>
+                <Link
+                  href="/services"
+                  className="inline-flex items-center justify-center px-8 py-4 bg-white/10 backdrop-blur-sm text-white rounded-full border-2 border-white/20 hover:bg-white/20 transition-all"
+                >
+                  Our Services
+                </Link>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="hidden lg:block"
+            >
+              <div className="relative">
+                <div className="absolute -inset-4 bg-[#e8272c] rounded-2xl blur-2xl opacity-30" />
+                <ImageWithFallback
+                  src="https://images.unsplash.com/photo-1765561667528-28e39c6174dd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBzb2Z0d2FyZSUyMGRldmVsb3BtZW50JTIwdGVhbXxlbnwxfHx8fDE3NzEyNTIwNzZ8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
+                  alt="Software development"
+                  className="relative rounded-2xl shadow-2xl"
+                />
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {stats.map((stat, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="text-center"
+              >
+                <div className="text-4xl md:text-5xl font-bold text-[#e8272c] mb-2">
+                  {stat.number}
+                </div>
+                <div className="text-gray-600">{stat.label}</div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              Our Services
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Comprehensive software solutions tailored to your business needs
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {services.map((service, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-2 border border-gray-100"
+              >
+                <div className="w-16 h-16 bg-[#e8272c] rounded-xl flex items-center justify-center text-white mb-6">
+                  {service.icon}
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">
+                  {service.title}
+                </h3>
+                <p className="text-gray-600">{service.description}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-20 bg-gradient-to-br from-red-50 to-pink-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+            >
+              <ImageWithFallback
+                src="https://images.unsplash.com/photo-1496180470114-6ef490f3ff22?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBidXNpbmVzcyUyMG1lZXRpbmd8ZW58MXx8fHwxNzcxMzQxOTE0fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
+                alt="Team collaboration"
+                className="rounded-2xl shadow-2xl"
+              />
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+            >
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                Why Choose Softlien?
+              </h2>
+              <p className="text-lg text-gray-600 mb-8">
+                We combine technical expertise with creative innovation to
+                deliver solutions that exceed expectations.
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {features.map((feature, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, x: 20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    className="flex items-start space-x-3"
+                  >
+                    <CheckCircle
+                      className="text-green-500 flex-shrink-0 mt-1"
+                      size={20}
+                    />
+                    <span className="text-gray-700">{feature}</span>
+                  </motion.div>
+                ))}
+              </div>
+
+              <Link
+                href="/about"
+                className="inline-flex items-center mt-8 text-[#e8272c] hover:text-[#d01f24] font-semibold"
+              >
+                Learn More About Us
+                <ArrowRight className="ml-2" size={20} />
+              </Link>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-20 bg-gradient-to-br from-[#8b0000] via-[#c00] to-[#e8272c] text-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              Ready to Start Your Project?
+            </h2>
+            <p className="text-xl text-gray-200 mb-8">
+              Let&apos;s discuss how we can help transform your ideas into
+              reality
+            </p>
+            <Link
+              href="/contact"
+              className="inline-flex items-center px-8 py-4 bg-white text-[#e8272c] rounded-full font-semibold hover:shadow-2xl transition-all transform hover:scale-105"
+            >
+              Contact Us Today
+              <ArrowRight className="ml-2" size={20} />
+            </Link>
+          </motion.div>
+        </div>
+      </section>
     </div>
   );
 }
