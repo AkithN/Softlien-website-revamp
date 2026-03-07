@@ -11,6 +11,8 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { ImageWithFallback } from "@/components/ImageWithFallback";
+import { HeroMeshBackground } from "@/components/HeroMeshBackground";
+import { Tilt } from "@/components/Tilt";
 
 export default function Home() {
   const services = [
@@ -69,6 +71,8 @@ export default function Home() {
           </div>
         </div>
 
+        <HeroMeshBackground className="absolute inset-0 pointer-events-none opacity-70 hidden md:block" />
+
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <motion.div
@@ -109,14 +113,14 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="hidden lg:block"
             >
-              <div className="relative">
+              <Tilt className="relative">
                 <div className="absolute -inset-4 bg-[#e8272c] rounded-2xl blur-2xl opacity-30" />
                 <ImageWithFallback
                   src="https://images.unsplash.com/photo-1765561667528-28e39c6174dd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBzb2Z0d2FyZSUyMGRldmVsb3BtZW50JTIwdGVhbXxlbnwxfHx8fDE3NzEyNTIwNzZ8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
                   alt="Software development"
                   className="relative rounded-2xl shadow-2xl"
                 />
-              </div>
+              </Tilt>
             </motion.div>
           </div>
         </div>
@@ -168,15 +172,17 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-2 border border-gray-100"
+                className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all border border-gray-100"
               >
-                <div className="w-16 h-16 bg-[#e8272c] rounded-xl flex items-center justify-center text-white mb-6">
-                  {service.icon}
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">
-                  {service.title}
-                </h3>
-                <p className="text-gray-600">{service.description}</p>
+                <Tilt>
+                  <div className="w-16 h-16 bg-[#e8272c] rounded-xl flex items-center justify-center text-white mb-6">
+                    {service.icon}
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-3">
+                    {service.title}
+                  </h3>
+                  <p className="text-gray-600">{service.description}</p>
+                </Tilt>
               </motion.div>
             ))}
           </div>

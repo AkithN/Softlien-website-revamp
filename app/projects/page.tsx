@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 import { useState } from "react";
 import { ExternalLink, Calendar, Tag } from "lucide-react";
 import { ImageWithFallback } from "@/components/ImageWithFallback";
+import { Tilt } from "@/components/Tilt";
 import Link from "next/link";
 
 export default function Projects() {
@@ -177,56 +178,58 @@ export default function Projects() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-2"
+                className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all"
               >
-                <div className="relative overflow-hidden aspect-video">
-                  <ImageWithFallback
-                    src={project.image}
-                    alt={project.title}
-                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className="absolute bottom-4 right-4">
-                      <a
-                        href={project.link}
-                        className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-blue-600 hover:bg-blue-600 hover:text-white transition-colors"
-                      >
-                        <ExternalLink size={20} />
-                      </a>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="px-3 py-1 bg-red-50 text-[#e8272c] text-sm font-medium rounded-full">
-                      {project.category}
-                    </span>
-                    <div className="flex items-center text-sm text-gray-500">
-                      <Calendar size={14} className="mr-1" />
-                      {project.date}
+                <Tilt>
+                  <div className="relative overflow-hidden aspect-video">
+                    <ImageWithFallback
+                      src={project.image}
+                      alt={project.title}
+                      className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="absolute bottom-4 right-4">
+                        <a
+                          href={project.link}
+                          className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-blue-600 hover:bg-blue-600 hover:text-white transition-colors"
+                        >
+                          <ExternalLink size={20} />
+                        </a>
+                      </div>
                     </div>
                   </div>
 
-                  <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-[#e8272c] transition-colors">
-                    {project.title}
-                  </h3>
-                  <p className="text-gray-600 mb-4 line-clamp-3">
-                    {project.description}
-                  </p>
-
-                  <div className="flex flex-wrap gap-2">
-                    {project.tags.map((tag, idx) => (
-                      <span
-                        key={idx}
-                        className="flex items-center text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded"
-                      >
-                        <Tag size={12} className="mr-1" />
-                        {tag}
+                  <div className="p-6">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="px-3 py-1 bg-red-50 text-[#e8272c] text-sm font-medium rounded-full">
+                        {project.category}
                       </span>
-                    ))}
+                      <div className="flex items-center text-sm text-gray-500">
+                        <Calendar size={14} className="mr-1" />
+                        {project.date}
+                      </div>
+                    </div>
+
+                    <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-[#e8272c] transition-colors">
+                      {project.title}
+                    </h3>
+                    <p className="text-gray-600 mb-4 line-clamp-3">
+                      {project.description}
+                    </p>
+
+                    <div className="flex flex-wrap gap-2">
+                      {project.tags.map((tag, idx) => (
+                        <span
+                          key={idx}
+                          className="flex items-center text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded"
+                        >
+                          <Tag size={12} className="mr-1" />
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                </Tilt>
               </motion.div>
             ))}
           </div>
