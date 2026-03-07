@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import {
   Facebook,
   Twitter,
@@ -8,6 +9,7 @@ import {
   Phone,
   MapPin,
 } from "lucide-react";
+import logoWhite from "../app/logo-white.png";
 
 export function Footer() {
   return (
@@ -16,10 +18,12 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center space-x-3 mb-4">
-              <img
-                src="/logo.png"
+              <Image
+                src={logoWhite}
                 alt="Softlien Logo"
                 className="h-12 w-auto object-contain"
+                width={220}
+                height={48}
               />
             </div>
             <p className="text-sm mb-4">

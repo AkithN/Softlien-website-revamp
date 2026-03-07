@@ -1,16 +1,20 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
+import logoRed from "../app/logo-red.png";
+import logoWhite from "../app/logo-white.png";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [logoError, setLogoError] = useState(false);
   const pathname = usePathname();
+
+  const logoSrc = scrolled ? logoRed : logoWhite;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -45,16 +49,14 @@ export function Navbar() {
             href="/"
             className={`flex items-center space-x-3 ${scrolled ? "text-gray-700" : "text-white"}`}
           >
-            {!logoError ? (
-              <img
-                src="/logo.png"
-                alt="Softlien Logo"
-                className="h-10 w-auto object-contain"
-                onError={() => setLogoError(true)}
-              />
-            ) : (
-              <span className="text-xl font-bold">Softlien</span>
-            )}
+            <Image
+              src={logoSrc}
+              alt="Softlien Logo"
+              className="h-10 w-auto object-contain"
+              width={180}
+              height={40}
+              priority
+            />
           </Link>
 
           <div className="hidden md:flex items-center space-x-8">
