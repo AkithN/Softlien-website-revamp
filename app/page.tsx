@@ -13,6 +13,7 @@ import {
 import { ImageWithFallback } from "@/components/ImageWithFallback";
 import { HeroMeshBackground } from "@/components/HeroMeshBackground";
 import { Tilt } from "@/components/Tilt";
+import { SectionMeshBackdrop } from "@/components/SectionMeshBackdrop";
 
 export default function Home() {
   const services = [
@@ -126,8 +127,11 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="relative overflow-hidden py-20 bg-gray-50">
+        <div className="absolute inset-0 pointer-events-none z-0">
+          <SectionMeshBackdrop className="absolute -inset-10" intensity={0.6} />
+        </div>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
               <motion.div
@@ -148,8 +152,11 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="relative overflow-hidden py-20">
+        <div className="absolute inset-0 pointer-events-none z-0">
+          <SectionMeshBackdrop className="absolute -inset-10" intensity={0.75} />
+        </div>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -189,8 +196,11 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-20 bg-gradient-to-br from-red-50 to-pink-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="relative overflow-hidden py-20 bg-gradient-to-br from-red-50 to-pink-50">
+        <div className="absolute inset-0 pointer-events-none z-0">
+          <SectionMeshBackdrop className="absolute -inset-10" intensity={0.9} />
+        </div>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <motion.div
               initial={{ opacity: 0, x: -30 }}
