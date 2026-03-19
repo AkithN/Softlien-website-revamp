@@ -5,7 +5,6 @@ import Link from "next/link";
 import {
   Target,
   Eye,
-  Award,
   Users,
   TrendingUp,
   Heart,

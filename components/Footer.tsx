@@ -78,6 +78,14 @@ export function Footer() {
                   Contact
                 </Link>
               </li>
+              <li>
+                <Link
+                  href="/admin"
+                  className="hover:text-[#e8272c] transition-colors text-gray-400"
+                >
+                  Admin
+                </Link>
+              </li>
             </ul>
           </div>
 
