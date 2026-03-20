@@ -40,16 +40,20 @@ export function ProjectFeedbackModal({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          projectId: projectTitle,
-          name,
-          email,
+          projectId: projectTitle.trim(),
+          name: name.trim(),
+          email: email.trim(),
           rating,
-          message,
+          message: message.trim(),
         }),
       });
 
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        throw new Error("Failed to submit feedback");
+        setError(
+          typeof data.error === "string" ? data.error : "Failed to submit feedback"
+        );
+        return;
       }
 
       setSuccess(true);
@@ -64,7 +68,7 @@ export function ProjectFeedbackModal({
           setMessage("");
         }, 300);
       }, 2000);
-    } catch (err) {
+    } catch {
       setError("Something went wrong. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -106,8 +110,10 @@ export function ProjectFeedbackModal({
                     Thank You!
                   </h3>
                   <p className="text-gray-600">
-                    Your feedback for {projectTitle} has been submitted
-                    successfully.
+                    Thank you! Published reviews appear on the{" "}
+                    <span className="font-semibold text-gray-800">home page</span>{" "}
+                    in the Client Feedback section—immediately or after an admin
+                    approves them, depending on how this site is configured.
                   </p>
                 </motion.div>
               ) : (
@@ -116,7 +122,7 @@ export function ProjectFeedbackModal({
                     Leave Feedback
                   </h2>
                   <p className="text-gray-600 mb-6">
-                    We'd love to hear your thoughts on{" "}
+                    We&apos;d love to hear your thoughts on{" "}
                     <span className="font-semibold text-[#e8272c]">
                       {projectTitle}
                     </span>
