@@ -25,10 +25,6 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  useEffect(() => {
-    setIsOpen(false);
-  }, [pathname]);
-
   const navLinks = [
     { path: "/", label: "Home" },
     { path: "/services", label: "Services" },
@@ -112,6 +108,7 @@ export function Navbar() {
                 <Link
                   key={link.path}
                   href={link.path}
+                  onClick={() => setIsOpen(false)}
                   className={`block px-4 py-3 rounded-lg transition-colors ${
                     pathname === link.path
                       ? "bg-red-50 text-[#e8272c]"
@@ -123,6 +120,7 @@ export function Navbar() {
               ))}
               <Link
                 href="/contact"
+                onClick={() => setIsOpen(false)}
                 className="block px-4 py-3 bg-[#e8272c] text-white rounded-lg text-center hover:bg-[#d01f24]"
               >
                 Get Started

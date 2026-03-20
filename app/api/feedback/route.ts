@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/mongodb";
 import { ProjectFeedback } from "@/lib/types";
+import { ObjectId } from "mongodb";
+
+// For MongoDB, `_id` is an ObjectId, but our shared `ProjectFeedback` type
+// uses a string id shape for UI/API payloads. Keep DB insert typing correct.
+type MongoProjectFeedback = Omit<ProjectFeedback, "_id"> & { _id?: ObjectId };
 
 export async function POST(request: Request) {
   try {
@@ -28,7 +33,8 @@ export async function POST(request: Request) {
     // with ADMIN_SECRET, require a publish action in /admin.
     const needsModeration = Boolean(process.env.ADMIN_SECRET?.trim());
 
-    const feedback: ProjectFeedback = {
+    // `_id` is created by MongoDB, so we omit it here.
+    const feedback: Omit<MongoProjectFeedback, "_id"> = {
       projectId,
       name,
       email,
@@ -39,10 +45,13 @@ export async function POST(request: Request) {
     };
 
     const db = await getDb();
-    const result = await db.collection("feedbacks").insertOne(feedback);
+    const result = await db.collection<MongoProjectFeedback>("feedbacks").insertOne(feedback);
 
     return NextResponse.json(
-      { message: "Feedback submitted successfully", id: result.insertedId },
+      {
+        message: "Feedback submitted successfully",
+        id: result.insertedId.toString(),
+      },
       { status: 201 }
     );
   } catch (error) {
