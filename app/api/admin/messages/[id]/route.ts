@@ -5,6 +5,10 @@ import type { ContactMessage } from "@/lib/types";
 
 const COLLECTION = "messages";
 
+// For MongoDB, `_id` is an ObjectId, but our shared `ContactMessage` type uses a
+// string id for UI/API payloads. This local type keeps DB typing correct.
+type MongoContactMessage = Omit<ContactMessage, "_id"> & { _id: ObjectId };
+
 function checkAdminAuth(request: Request): boolean {
   const secret = process.env.ADMIN_SECRET;
   if (!secret) return true;
@@ -26,12 +30,12 @@ export async function PATCH(
       return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
     }
     const body = await request.json();
-    const updates: Partial<ContactMessage> = {};
+    const updates: Partial<Omit<MongoContactMessage, "_id">> = {};
     if (typeof body.read === "boolean") updates.read = body.read;
 
     const db = await getDb();
     const result = await db
-      .collection<ContactMessage>(COLLECTION)
+      .collection<MongoContactMessage>(COLLECTION)
       .updateOne({ _id: new ObjectId(id) }, { $set: updates });
 
     if (result.matchedCount === 0) {
@@ -58,7 +62,7 @@ export async function DELETE(
     }
     const db = await getDb();
     const result = await db
-      .collection<ContactMessage>(COLLECTION)
+      .collection<MongoContactMessage>(COLLECTION)
       .deleteOne({ _id: new ObjectId(id) });
 
     if (result.deletedCount === 0) {
