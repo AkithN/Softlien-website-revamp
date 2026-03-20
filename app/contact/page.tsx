@@ -15,13 +15,24 @@ export default function Contact() {
   });
 
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
+    setError(null);
     setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Failed to send message.");
+        setSubmitted(false);
+        return;
+      }
       setFormData({
         name: "",
         email: "",
@@ -30,7 +41,11 @@ export default function Contact() {
         service: "",
         message: "",
       });
-    }, 3000);
+      setTimeout(() => setSubmitted(false), 3000);
+    } catch {
+      setError("Failed to send message. Please try again.");
+      setSubmitted(false);
+    }
   };
 
   const handleChange = (
@@ -48,7 +63,7 @@ export default function Contact() {
     {
       icon: <Phone size={24} />,
       title: "Phone",
-      details: ["+1 (555) 123-4567", "+1 (555) 987-6543"],
+      details: ["+94 77 123 2323", "+94 76 322 3190"],
     },
     {
       icon: <Mail size={24} />,
@@ -58,7 +73,7 @@ export default function Contact() {
     {
       icon: <MapPin size={24} />,
       title: "Office",
-      details: ["123 Tech Street", "Silicon Valley, CA 94025"],
+      details: ["28/A/7", "Galle Road Matara"],
     },
     {
       icon: <Clock size={24} />,
@@ -223,6 +238,10 @@ export default function Contact() {
                     placeholder="Tell us about your project..."
                   />
                 </div>
+
+                {error && (
+                  <p className="text-red-600 text-sm font-medium">{error}</p>
+                )}
 
                 <button
                   type="submit"

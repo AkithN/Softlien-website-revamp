@@ -14,8 +14,25 @@ import { ImageWithFallback } from "@/components/ImageWithFallback";
 import { HeroMeshBackground } from "@/components/HeroMeshBackground";
 import { Tilt } from "@/components/Tilt";
 import { SectionMeshBackdrop } from "@/components/SectionMeshBackdrop";
+import { useState, useEffect } from "react";
+import { Star, MessageSquareQuote } from "lucide-react";
+import { ProjectFeedback } from "@/lib/types";
 
 export default function Home() {
+  const [feedbacks, setFeedbacks] = useState<ProjectFeedback[]>([]);
+
+  useEffect(() => {
+    fetch("/api/feedback/published", { cache: "no-store" })
+      .then((res) => {
+        if (!res.ok) return [];
+        return res.json();
+      })
+      .then((data) => {
+        if (Array.isArray(data)) setFeedbacks(data);
+      })
+      .catch((err) => console.error("Failed to load feedback:", err));
+  }, []);
+
   const services = [
     {
       icon: <Code size={32} />,
@@ -257,6 +274,99 @@ export default function Home() {
               </Link>
             </motion.div>
           </div>
+        </div>
+      </section>
+
+      <section className="relative overflow-hidden py-24 bg-gray-50">
+        <div className="absolute inset-0 pointer-events-none z-0">
+          <SectionMeshBackdrop className="absolute -inset-10" intensity={0.5} />
+        </div>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <div className="inline-flex items-center justify-center p-3 bg-red-100 text-[#e8272c] rounded-2xl mb-6">
+              <MessageSquareQuote size={32} />
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              Client Feedback
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Hear what our clients have to say about our projects and services.
+            </p>
+            <p className="text-sm text-gray-500 max-w-xl mx-auto mt-3">
+              Reviews are submitted from the{" "}
+              <Link
+                href="/projects"
+                className="text-[#e8272c] font-medium hover:underline"
+              >
+                Projects
+              </Link>{" "}
+              page; only published testimonials appear here.
+            </p>
+          </motion.div>
+
+          {feedbacks.length === 0 ? (
+            <div className="text-center py-12 px-6 rounded-2xl border border-dashed border-gray-200 bg-white/60">
+              <p className="text-gray-600 mb-4">
+                No published testimonials yet. Leave feedback on a project, then
+                publish it from the admin dashboard if moderation is enabled.
+              </p>
+              <Link
+                href="/projects"
+                className="inline-flex items-center text-[#e8272c] font-semibold hover:underline"
+              >
+                Go to Projects
+                <ArrowRight className="ml-2" size={18} />
+              </Link>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {feedbacks.map((fb, index) => (
+                <motion.div
+                  key={fb._id || index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className="bg-white p-8 rounded-3xl shadow-lg border border-gray-100 relative group"
+                >
+                  <div className="absolute top-0 right-0 p-8 opacity-5 transform group-hover:scale-110 transition-transform duration-500">
+                    <MessageSquareQuote size={100} />
+                  </div>
+
+                  <div className="flex gap-1 mb-6">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star
+                        key={star}
+                        size={20}
+                        className={`${star <= fb.rating ? "fill-yellow-400 text-yellow-400" : "text-gray-200"}`}
+                      />
+                    ))}
+                  </div>
+
+                  <p className="text-gray-700 mb-8 italic relative z-10 leading-relaxed">
+                    &ldquo;{fb.message}&rdquo;
+                  </p>
+
+                  <div className="mt-auto relative z-10 flex items-center gap-4">
+                    <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center font-bold text-gray-500 text-lg">
+                      {fb.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-gray-900">{fb.name}</h4>
+                      <p className="text-sm text-[#e8272c] font-medium">
+                        {fb.projectId}
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

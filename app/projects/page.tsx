@@ -2,13 +2,15 @@
 
 import { motion } from "motion/react";
 import { useState } from "react";
-import { ExternalLink, Calendar, Tag } from "lucide-react";
+import { ExternalLink, Calendar, Tag, MessageSquareHeart } from "lucide-react";
 import { ImageWithFallback } from "@/components/ImageWithFallback";
 import { Tilt } from "@/components/Tilt";
 import Link from "next/link";
+import { ProjectFeedbackModal } from "@/components/ProjectFeedbackModal";
 
 export default function Projects() {
   const [filter, setFilter] = useState("All");
+  const [selectedProjectForFeedback, setSelectedProjectForFeedback] = useState<string | null>(null);
 
   const categories = [
     "All",
@@ -217,7 +219,7 @@ export default function Projects() {
                       {project.description}
                     </p>
 
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-2 mb-6">
                       {project.tags.map((tag, idx) => (
                         <span
                           key={idx}
@@ -227,6 +229,16 @@ export default function Projects() {
                           {tag}
                         </span>
                       ))}
+                    </div>
+                    
+                    <div className="mt-auto border-t border-gray-100 pt-4">
+                      <button
+                        onClick={() => setSelectedProjectForFeedback(project.title)}
+                        className="w-full flex items-center justify-center py-2.5 px-4 rounded-lg bg-red-50 text-[#e8272c] hover:bg-[#e8272c] hover:text-white transition-colors font-medium text-sm"
+                      >
+                        <MessageSquareHeart size={16} className="mr-2" />
+                        Leave Feedback
+                      </button>
                     </div>
                   </div>
                 </Tilt>
@@ -308,6 +320,12 @@ export default function Projects() {
           </motion.div>
         </div>
       </section>
+
+      <ProjectFeedbackModal
+        isOpen={!!selectedProjectForFeedback}
+        onClose={() => setSelectedProjectForFeedback(null)}
+        projectTitle={selectedProjectForFeedback || ""}
+      />
     </div>
   );
 }
