@@ -1,21 +1,7 @@
 import { NextResponse } from "next/server";
-import { getDb } from "@/lib/mongodb";
-import { ObjectId } from "mongodb";
-import type { ContactMessage } from "@/lib/types";
-
-const COLLECTION = "messages";
-
-// For MongoDB, `_id` is an ObjectId, but our shared `ContactMessage` type uses a
-// string id for UI/API payloads. This local type keeps DB typing correct.
-type MongoContactMessage = Omit<ContactMessage, "_id"> & { _id: ObjectId };
-
-function checkAdminAuth(request: Request): boolean {
-  const secret = process.env.ADMIN_SECRET;
-  if (!secret) return true;
-  const authHeader = request.headers.get("authorization");
-  const token = authHeader?.replace(/^Bearer\s+/i, "") ?? "";
-  return token === secret;
-}
+import { deleteDoc, doc, getDoc, updateDoc } from "firebase/firestore";
+import { COLLECTIONS, getFirestoreDb, isValidFirestoreDocId } from "@/lib/firebase";
+import { checkAdminAuth } from "@/lib/admin-auth";
 
 export async function PATCH(
   request: Request,
@@ -26,21 +12,23 @@ export async function PATCH(
   }
   try {
     const { id } = await params;
-    if (!ObjectId.isValid(id)) {
+    if (!isValidFirestoreDocId(id)) {
       return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
     }
     const body = await request.json();
-    const updates: Partial<Omit<MongoContactMessage, "_id">> = {};
+    const updates: Record<string, boolean> = {};
     if (typeof body.read === "boolean") updates.read = body.read;
+    if (Object.keys(updates).length === 0) {
+      return NextResponse.json({ error: "No valid fields to update" }, { status: 400 });
+    }
 
-    const db = await getDb();
-    const result = await db
-      .collection<MongoContactMessage>(COLLECTION)
-      .updateOne({ _id: new ObjectId(id) }, { $set: updates });
-
-    if (result.matchedCount === 0) {
+    const db = getFirestoreDb();
+    const ref = doc(db, COLLECTIONS.messages, id);
+    const existing = await getDoc(ref);
+    if (!existing.exists()) {
       return NextResponse.json({ error: "Message not found" }, { status: 404 });
     }
+    await updateDoc(ref, updates);
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("Admin message update error:", err);
@@ -57,17 +45,16 @@ export async function DELETE(
   }
   try {
     const { id } = await params;
-    if (!ObjectId.isValid(id)) {
+    if (!isValidFirestoreDocId(id)) {
       return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
     }
-    const db = await getDb();
-    const result = await db
-      .collection<MongoContactMessage>(COLLECTION)
-      .deleteOne({ _id: new ObjectId(id) });
-
-    if (result.deletedCount === 0) {
+    const db = getFirestoreDb();
+    const ref = doc(db, COLLECTIONS.messages, id);
+    const existing = await getDoc(ref);
+    if (!existing.exists()) {
       return NextResponse.json({ error: "Message not found" }, { status: 404 });
     }
+    await deleteDoc(ref);
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("Admin message delete error:", err);

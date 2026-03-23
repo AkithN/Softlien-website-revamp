@@ -1,11 +1,7 @@
 import { NextResponse } from "next/server";
-import { getDb } from "@/lib/mongodb";
-import { ProjectFeedback } from "@/lib/types";
-import { ObjectId } from "mongodb";
-
-// For MongoDB, `_id` is an ObjectId, but our shared `ProjectFeedback` type
-// uses a string id shape for UI/API payloads. Keep DB insert typing correct.
-type MongoProjectFeedback = Omit<ProjectFeedback, "_id"> & { _id?: ObjectId };
+import { addDoc, collection } from "firebase/firestore";
+import { COLLECTIONS, getFirestoreDb } from "@/lib/firebase";
+import type { ProjectFeedback } from "@/lib/types";
 
 export async function POST(request: Request) {
   try {
@@ -29,28 +25,24 @@ export async function POST(request: Request) {
       );
     }
 
-    // Match admin API: no ADMIN_SECRET = open/dev → show on site immediately;
-    // with ADMIN_SECRET, require a publish action in /admin.
-    const needsModeration = Boolean(process.env.ADMIN_SECRET?.trim());
-
-    // `_id` is created by MongoDB, so we omit it here.
-    const feedback: Omit<MongoProjectFeedback, "_id"> = {
+    const feedback: Omit<ProjectFeedback, "_id"> = {
       projectId,
       name,
       email,
       rating,
       message,
-      status: needsModeration ? "pending" : "published",
+      // New feedback always requires admin review before becoming public.
+      status: "pending",
       createdAt: new Date(),
     };
 
-    const db = await getDb();
-    const result = await db.collection<MongoProjectFeedback>("feedbacks").insertOne(feedback);
+    const db = getFirestoreDb();
+    const ref = await addDoc(collection(db, COLLECTIONS.feedbacks), feedback);
 
     return NextResponse.json(
       {
         message: "Feedback submitted successfully",
-        id: result.insertedId.toString(),
+        id: ref.id,
       },
       { status: 201 }
     );

@@ -110,10 +110,9 @@ export function ProjectFeedbackModal({
                     Thank You!
                   </h3>
                   <p className="text-gray-600">
-                    Thank you! Published reviews appear on the{" "}
+                    Thank you! Your review is now pending admin approval. Once approved, it will appear on the{" "}
                     <span className="font-semibold text-gray-800">home page</span>{" "}
-                    in the Client Feedback section—immediately or after an admin
-                    approves them, depending on how this site is configured.
+                    in the Client Feedback section.
                   </p>
                 </motion.div>
               ) : (

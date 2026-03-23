@@ -5,14 +5,17 @@ import { motion } from "motion/react";
 import { Mail, MessageSquare, Building2, Phone, User, Calendar, Trash2, CheckCircle, Circle, LogIn, Loader2, ChevronDown, ChevronUp, MessageSquareHeart, Star, Globe, XCircle } from "lucide-react";
 import { SERVICE_LABELS, type ContactMessage, type ProjectFeedback } from "@/lib/types";
 
-const STORAGE_KEY = "softlien_admin_token";
+const TOKEN_STORAGE_KEY = "softlien_admin_token";
+const USERNAME_STORAGE_KEY = "softlien_admin_username";
 
 function getAuthHeaders(): HeadersInit {
   if (typeof window === "undefined") return {};
-  const token = sessionStorage.getItem(STORAGE_KEY);
+  const token = sessionStorage.getItem(TOKEN_STORAGE_KEY);
+  const username = sessionStorage.getItem(USERNAME_STORAGE_KEY);
   if (!token) return { "Content-Type": "application/json" };
   return {
     "Content-Type": "application/json",
+    ...(username ? { "X-Admin-Username": username } : {}),
     Authorization: `Bearer ${token}`,
   };
 }
@@ -27,7 +30,9 @@ function formatDate(d: string | Date) {
 
 export default function AdminDashboard() {
   const [token, setToken] = useState<string | null>(null);
+  const [username, setUsername] = useState<string | null>(null);
   const [needsAuth, setNeedsAuth] = useState(false);
+  const [usernameInput, setUsernameInput] = useState("");
   const [passwordInput, setPasswordInput] = useState("");
   const [loginError, setLoginError] = useState<string | null>(null);
   
@@ -40,9 +45,10 @@ export default function AdminDashboard() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  const fetchData = useCallback(async (authToken?: string) => {
+  const fetchData = useCallback(async (authUsername?: string, authToken?: string) => {
     const headers: HeadersInit = { "Content-Type": "application/json" };
     if (authToken) headers.Authorization = `Bearer ${authToken}`;
+    if (authUsername) headers["X-Admin-Username"] = authUsername;
     
     try {
       const [messagesRes, feedbacksRes] = await Promise.all([
@@ -72,16 +78,27 @@ export default function AdminDashboard() {
   }, []);
 
   useEffect(() => {
-    const stored = typeof window !== "undefined" ? sessionStorage.getItem(STORAGE_KEY) : null;
+    const stored =
+      typeof window !== "undefined" ? sessionStorage.getItem(TOKEN_STORAGE_KEY) : null;
+    const storedUsername =
+      typeof window !== "undefined" ? sessionStorage.getItem(USERNAME_STORAGE_KEY) : null;
     if (stored) setToken(stored);
+    if (storedUsername) setUsername(storedUsername);
   }, []);
 
   useEffect(() => {
     if (token === null && typeof window !== "undefined") {
-      const stored = sessionStorage.getItem(STORAGE_KEY);
+      const stored = sessionStorage.getItem(TOKEN_STORAGE_KEY);
       if (stored) setToken(stored);
     }
   }, [token]);
+
+  useEffect(() => {
+    if (username === null && typeof window !== "undefined") {
+      const storedUsername = sessionStorage.getItem(USERNAME_STORAGE_KEY);
+      if (storedUsername) setUsername(storedUsername);
+    }
+  }, [username]);
 
   useEffect(() => {
     let cancelled = false;
@@ -89,14 +106,27 @@ export default function AdminDashboard() {
       setLoading(true);
       setError(null);
       try {
-        const authToken = token ?? (typeof window !== "undefined" ? sessionStorage.getItem(STORAGE_KEY) : null);
-        const ok = await fetchData(authToken ?? undefined);
+        const authToken =
+          token ??
+          (typeof window !== "undefined"
+            ? sessionStorage.getItem(TOKEN_STORAGE_KEY)
+            : null);
+        const authUsername =
+          username ??
+          (typeof window !== "undefined"
+            ? sessionStorage.getItem(USERNAME_STORAGE_KEY)
+            : null);
+        const ok = await fetchData(authUsername ?? undefined, authToken ?? undefined);
         if (cancelled) return;
         if (!ok) {
           setToken(null);
+          setUsername(null);
           setMessages([]);
           setFeedbacks([]);
-          if (typeof window !== "undefined") sessionStorage.removeItem(STORAGE_KEY);
+          if (typeof window !== "undefined") {
+            sessionStorage.removeItem(TOKEN_STORAGE_KEY);
+            sessionStorage.removeItem(USERNAME_STORAGE_KEY);
+          }
         }
       } catch (e) {
         if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load");
@@ -106,33 +136,41 @@ export default function AdminDashboard() {
     }
     load();
     return () => { cancelled = true; };
-  }, [token, fetchData]);
+  }, [token, username, fetchData]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginError(null);
+    const un = usernameInput.trim();
     const pw = passwordInput.trim();
-    if (!pw) {
-      setLoginError("Enter admin password.");
+    if (!un || !pw) {
+      setLoginError("Enter admin username and password.");
       return;
     }
-    sessionStorage.setItem(STORAGE_KEY, pw);
+    sessionStorage.setItem(USERNAME_STORAGE_KEY, un);
+    sessionStorage.setItem(TOKEN_STORAGE_KEY, pw);
+    setUsername(un);
     setToken(pw);
     setLoading(true);
-    const ok = await fetchData(pw);
+    const ok = await fetchData(un, pw);
     setLoading(false);
     if (!ok) {
-      setLoginError("Invalid password.");
-      sessionStorage.removeItem(STORAGE_KEY);
+      setLoginError("Invalid username or password.");
+      sessionStorage.removeItem(USERNAME_STORAGE_KEY);
+      sessionStorage.removeItem(TOKEN_STORAGE_KEY);
+      setUsername(null);
       setToken(null);
     } else {
+      setUsernameInput("");
       setPasswordInput("");
       setLoginError(null);
     }
   };
 
   const handleLogout = () => {
-    sessionStorage.removeItem(STORAGE_KEY);
+    sessionStorage.removeItem(USERNAME_STORAGE_KEY);
+    sessionStorage.removeItem(TOKEN_STORAGE_KEY);
+    setUsername(null);
     setToken(null);
     setMessages([]);
     setFeedbacks([]);
@@ -243,6 +281,20 @@ export default function AdminDashboard() {
               Admin access
             </h2>
             <form onSubmit={handleLogin} className="space-y-4">
+              <div>
+                <label htmlFor="admin-username" className="block text-sm font-medium text-gray-700 mb-1">
+                  Username
+                </label>
+                <input
+                  id="admin-username"
+                  type="text"
+                  value={usernameInput}
+                  onChange={(e) => setUsernameInput(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#e8272c] focus:border-transparent"
+                  placeholder="Admin username"
+                  autoComplete="username"
+                />
+              </div>
               <div>
                 <label htmlFor="admin-pw" className="block text-sm font-medium text-gray-700 mb-1">
                   Password

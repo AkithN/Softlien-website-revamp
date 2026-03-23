@@ -1,29 +1,20 @@
 import { NextResponse } from "next/server";
-import { getDb } from "@/lib/mongodb";
-import type { ProjectFeedback } from "@/lib/types";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { COLLECTIONS, feedbackFromDoc, getFirestoreDb } from "@/lib/firebase";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const db = await getDb();
-    const feedbacks = await db
-      .collection<ProjectFeedback>("feedbacks")
-      .find({ status: "published" })
-      .sort({ createdAt: -1 })
-      .limit(10)
-      .toArray();
+    const db = getFirestoreDb();
+    const snap = await getDocs(
+      query(collection(db, COLLECTIONS.feedbacks), where("status", "==", "published"))
+    );
 
-    const list = feedbacks.map((f) => ({
-      _id: f._id?.toString(),
-      projectId: f.projectId,
-      name: f.name,
-      email: f.email,
-      rating: f.rating,
-      message: f.message,
-      status: f.status,
-      createdAt: f.createdAt,
-    }));
+    const list = snap.docs
+      .map((d) => feedbackFromDoc(d.id, d.data()))
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .slice(0, 10);
 
     return NextResponse.json(list);
   } catch (error) {

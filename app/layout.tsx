@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { LayoutShell } from "@/components/LayoutShell";
+import { FirebaseClientInit } from "@/components/FirebaseClientInit";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -64,6 +65,7 @@ export default function RootLayout({
         suppressHydrationWarning
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <FirebaseClientInit />
         <div className="min-h-screen flex flex-col">
           <LayoutShell>{children}</LayoutShell>
         </div>

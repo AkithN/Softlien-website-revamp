@@ -1,40 +1,19 @@
 import { NextResponse } from "next/server";
-import { getDb } from "@/lib/mongodb";
-import type { ContactMessage } from "@/lib/types";
-
-const COLLECTION = "messages";
-
-function checkAdminAuth(request: Request): boolean {
-  const secret = process.env.ADMIN_SECRET;
-  if (!secret) return true; // no secret set = allow in dev
-  const authHeader = request.headers.get("authorization");
-  const token = authHeader?.replace(/^Bearer\s+/i, "") ?? "";
-  return token === secret;
-}
+import { collection, getDocs, orderBy, query } from "firebase/firestore";
+import { COLLECTIONS, getFirestoreDb, messageFromDoc } from "@/lib/firebase";
+import { checkAdminAuth } from "@/lib/admin-auth";
 
 export async function GET(request: Request) {
   if (!checkAdminAuth(request)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   try {
-    const db = await getDb();
-    const messages = await db
-      .collection<ContactMessage>(COLLECTION)
-      .find({})
-      .sort({ createdAt: -1 })
-      .toArray();
+    const db = getFirestoreDb();
+    const snap = await getDocs(
+      query(collection(db, COLLECTIONS.messages), orderBy("createdAt", "desc"))
+    );
 
-    const list = messages.map((m) => ({
-      _id: m._id?.toString(),
-      name: m.name,
-      email: m.email,
-      company: m.company,
-      phone: m.phone,
-      service: m.service,
-      message: m.message,
-      createdAt: m.createdAt,
-      read: m.read ?? false,
-    }));
+    const list = snap.docs.map((d) => messageFromDoc(d.id, d.data()));
 
     return NextResponse.json(list);
   } catch (err) {
