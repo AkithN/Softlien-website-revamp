@@ -1,15 +1,8 @@
 import { NextResponse } from "next/server";
-import { getDb } from "@/lib/mongodb";
-import { ObjectId } from "mongodb";
-import { ProjectFeedback } from "@/lib/types";
-
-function checkAdminAuth(request: Request): boolean {
-  const secret = process.env.ADMIN_SECRET;
-  if (!secret) return true;
-  const authHeader = request.headers.get("authorization");
-  const token = authHeader?.replace(/^Bearer\s+/i, "") ?? "";
-  return token === secret;
-}
+import { deleteDoc, doc, getDoc, updateDoc } from "firebase/firestore";
+import { COLLECTIONS, getFirestoreDb, isValidFirestoreDocId } from "@/lib/firebase";
+import type { ProjectFeedback } from "@/lib/types";
+import { checkAdminAuth } from "@/lib/admin-auth";
 
 export async function PATCH(
   request: Request,
@@ -20,23 +13,26 @@ export async function PATCH(
   }
   try {
     const { id } = await params;
-    if (!ObjectId.isValid(id)) {
+    if (!isValidFirestoreDocId(id)) {
       return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
     }
-    const body = await request.json();
-    const updates: Partial<ProjectFeedback> = {};
-    if (["pending", "published", "rejected"].includes(body.status)) {
-      updates.status = body.status;
+    const body = (await request.json()) as { status?: string };
+    const updates: Partial<Pick<ProjectFeedback, "status">> = {};
+    const s = body.status;
+    if (s === "pending" || s === "published" || s === "rejected") {
+      updates.status = s;
+    }
+    if (!updates.status) {
+      return NextResponse.json({ error: "Invalid status" }, { status: 400 });
     }
 
-    const db = await getDb();
-    const result = await db
-      .collection("feedbacks")
-      .updateOne({ _id: new ObjectId(id) }, { $set: updates });
-
-    if (result.matchedCount === 0) {
+    const db = getFirestoreDb();
+    const ref = doc(db, COLLECTIONS.feedbacks, id);
+    const existing = await getDoc(ref);
+    if (!existing.exists()) {
       return NextResponse.json({ error: "Feedback not found" }, { status: 404 });
     }
+    await updateDoc(ref, { status: updates.status });
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("Admin feedback update error:", err);
@@ -53,17 +49,16 @@ export async function DELETE(
   }
   try {
     const { id } = await params;
-    if (!ObjectId.isValid(id)) {
+    if (!isValidFirestoreDocId(id)) {
       return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
     }
-    const db = await getDb();
-    const result = await db
-      .collection("feedbacks")
-      .deleteOne({ _id: new ObjectId(id) });
-
-    if (result.deletedCount === 0) {
+    const db = getFirestoreDb();
+    const ref = doc(db, COLLECTIONS.feedbacks, id);
+    const existing = await getDoc(ref);
+    if (!existing.exists()) {
       return NextResponse.json({ error: "Feedback not found" }, { status: 404 });
     }
+    await deleteDoc(ref);
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("Admin feedback delete error:", err);

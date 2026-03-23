@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
-import { getDb } from "@/lib/mongodb";
+import { addDoc, collection } from "firebase/firestore";
+import { COLLECTIONS, getFirestoreDb } from "@/lib/firebase";
 import type { ContactMessage } from "@/lib/types";
-
-const COLLECTION = "messages";
 
 export async function POST(request: Request) {
   try {
@@ -27,11 +26,11 @@ export async function POST(request: Request) {
       read: false,
     };
 
-    const db = await getDb();
-    const result = await db.collection<ContactMessage>(COLLECTION).insertOne(doc as ContactMessage);
+    const db = getFirestoreDb();
+    const ref = await addDoc(collection(db, COLLECTIONS.messages), doc);
 
     return NextResponse.json(
-      { success: true, id: result.insertedId.toString() },
+      { success: true, id: ref.id },
       { status: 201 }
     );
   } catch (err) {
